@@ -8,7 +8,7 @@ const router = require('./routes')
 const cors = require('cors')
 const errorHandler = require('./middlewares/errorHandler')
 const mongoose = require('mongoose')
-const mongodb = process.env.MONGO_ATLAS || 'mongodb://localhost:27017'
+const mongodb = process.env.MONGO_ATLAS || 'mongodb://localhost:27017/'
 let dbName
 
 if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'test') {
