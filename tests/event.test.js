@@ -7,7 +7,7 @@ const request   = supertest(app);
 
 const dbName    = 'splitbill';
 
-const Event     = require('../schemas/Event');
+const Event     = require('../models/event');
 
 beforeAll(async () => {
     // Connect to a Mongo DB
