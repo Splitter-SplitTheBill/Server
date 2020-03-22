@@ -133,8 +133,8 @@ class UserController {
                         }
                     )
                     .then(userUpdated => {
-                        console.log(userUpdated, '=============')
                         res.status(200).json({
+                            userUpdated,
                             succeeded: {
                                 name,
                                 instance,
@@ -156,7 +156,6 @@ class UserController {
         // /users/:id/accounts/accountId
         const id = req.params.id
         const accountId = req.params.accountId
-        console.log(accountId,'###############')
         let accountIdFound = false
         let successRemove = {}
 
@@ -195,7 +194,7 @@ class UserController {
             }
         })
         .then(success => {
-            res.status(200).json(successRemove)
+            res.status(200).json({ success, successRemove })
         })
         .catch(next)
     }
@@ -235,7 +234,7 @@ class UserController {
             }
         })
         .then(success => {
-            res.status(200).json({success, userId: friendId})
+            res.status(200).json({ success, userId: friendId })
         })
         .catch(next)
     }
@@ -245,7 +244,7 @@ class UserController {
         const id = req.params.id
         const friendId = req.params.friendId
         let userIdFound = false
-
+        
         User.findById(id)
         .then(user => {
             if(user) {
@@ -267,15 +266,15 @@ class UserController {
                             }
                         }
                     )
+                    .then(success => {
+                        res.status(200).json({ success, userId: friendId })
+                    })
                 } else {
                     next({ status: 400, message: 'FriendId not found' })
                 }
             } else {
                 next({ status: 400, message: 'UserId not found' })
             }
-        })
-        .then(success => {
-            res.status(200).json({success, userId: friendId})
         })
         .catch(next)
     }

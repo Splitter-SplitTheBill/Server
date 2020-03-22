@@ -33,7 +33,9 @@ beforeAll((done) => {
     .post('/users/register')
     .send(registerTwo)
     .end((err, res) => {
+        if(err) return done(err)
         unauthorizeToken = res.body.token
+        friendId = res.body._id
         done()
     })
 })
@@ -99,10 +101,6 @@ describe('POST /users/login - success', () => {
             username = res.body.username
             token = res.body.token
             accountId = res.body.accounts[0]._id
-            console.log(res.body.accounts)
-            console.log('accountId',accountId)
-            friendId = res.body.friendList[0].userId
-            console.log('friendId', friendId)
             expect(typeof res.body).toBe('object')
             expect(res.body).toHaveProperty('_id')
             expect(res.body).toHaveProperty('name')
@@ -287,6 +285,216 @@ describe('GET /users/username/:username - username not found', () => {
     })
 })
 
+describe('PATCH /users/:id/accounts - success', () => {
+    it('should return status(200) and object containing accounts data added', (done) => {
+        request(app)
+        .patch(`/users/${userId}/accounts`)
+        .set('token', token)
+        .send({
+            name: 'GOPAY',
+            instance: 'GOJEK',
+            accountNumber: '333333'
+        })
+        .expect(200)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body.succeeded).toBe('object')
+            // expect(res.body.succeeded).toHaveProperty('_id')
+            expect(res.body.succeeded).toHaveProperty('name')
+            expect(res.body.succeeded).toHaveProperty('instance')
+            expect(res.body.succeeded).toHaveProperty('accountNumber')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/accounts - error duplicate data', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/${userId}/accounts`)
+        .set('token', token)
+        .send({
+            name: 'GOPAY',
+            instance: 'GOJEK',
+            accountNumber: '333333'
+        })
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('All data already exist')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/accounts - error data not found', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/5e7579aa9fc3f1ecb89f6807/accounts`)
+        .set('token', token)
+        .send({
+            name: 'GOPAY',
+            instance: 'GOJEK',
+            accountNumber: '333333'
+        })
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('Data not found')
+            done()
+        })
+    })
+})
+
+describe('PATCH /users/:id/accounts/:accountId - success', () => {
+    it('should return status(200) and object containing accounts data deleted', (done) => {
+        request(app)
+        .patch(`/users/${userId}/accounts/${accountId}`)
+        .set('token', token)
+        .expect(200)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body.successRemove).toHaveProperty('_id')
+            expect(res.body.successRemove).toHaveProperty('name')
+            expect(res.body.successRemove).toHaveProperty('instance')
+            expect(res.body.successRemove).toHaveProperty('accountNumber')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/accounts/:accountId - error account id', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/${userId}/accounts/5e7579aa9fc3f1ecb89f6807`)
+        .set('token', token)
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('AccountId not found')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/accounts/:accountId - error user id', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/5e7579aa9fc3f1ecb89f6807/accounts/${accountId}`)
+        .set('token', token)
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('UserId not found')
+            done()
+        })
+    })
+})
+
+describe('PATCH /users/:id/friends - success', () => {
+    it('should return status(200) and object containing success user id added', (done) => {
+        request(app)
+        .patch(`/users/${userId}/friends`)
+        .set('token', token)
+        .send({
+            friendId: friendId
+        })
+        .expect(200)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('userId')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/friends - error user id', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/5e7579aa9fc3f1ecb89f6807/friends`)
+        .set('token', token)
+        .send({
+            friendId: friendId
+        })
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('UserId not found')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/friends - error duplicate', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/${userId}/friends`)
+        .set('token', token)
+        .send({
+            friendId: '5e7499e93c050e61249aeac7'
+        })
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('Data already exist')
+            done()
+        })
+    })
+})
+
+describe('PATCH /users/:id/friends/:friendId - success', () => {
+    it('should return status(200) and success user id deleted', (done) => {
+        request(app)
+        .patch(`/users/${userId}/friends/${friendId}`)
+        .set('token', token)
+        .expect(200)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('userId')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/friends/:friendId - error friend id', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/${userId}/friends/1234567890`)
+        .set('token', token)
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('FriendId not found')
+            done()
+        })
+    })
+})
+describe('PATCH /users/:id/friends/:friendId - error user id', () => {
+    it('should return status(400) and object containing error message', (done) => {
+        request(app)
+        .patch(`/users/5e7499e93c050e61249aeac7/friends/${friendId}`)
+        .set('token', token)
+        .expect(400)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('message')
+            expect(res.body.message).toContain('UserId not found')
+            done()
+        })
+    })
+})
+
 describe('PATCH /users/:id - success', () => {
     it('should return status(200) and object containing user data', (done) => {
         request(app)
@@ -312,44 +520,3 @@ describe('PATCH /users/:id - success', () => {
         })
     })
 })
-
-describe('PATCH /users/:id/accounts - success', () => {
-    it('should return status(200) and object containing accounts data added', (done) => {
-        request(app)
-        .patch(`/users/${userId}/accounts`)
-        .set('token', token)
-        .send({
-            name: 'GOPAY',
-            instance: 'GOJEK',
-            accountNumber: '333333'
-        })
-        .expect(200)
-        .end((err, res) => {
-            if(err) return done(err)
-            expect(typeof res.body.succeeded).toBe('object')
-            // expect(res.body.succeeded).toHaveProperty('_id')
-            expect(res.body.succeeded).toHaveProperty('name')
-            expect(res.body.succeeded).toHaveProperty('instance')
-            expect(res.body.succeeded).toHaveProperty('accountNumber')
-            done()
-        })
-    })
-})
-
-// describe('PATCH /users/:id/accounts/:accountId - success', () => {
-//     it('should return status(200) and object containing accounts data deleted', (done) => {
-//         request(app)
-//         .patch(`/users/${userId}/accounts/${accountId}`)
-//         .set('token', token)
-//         .expect(200)
-//         .end((err, res) => {
-//             if(err) return done(err)
-//             expect(typeof res.body).toBe('object')
-//             expect(res.body).toHaveProperty('_id')
-//             expect(res.body).toHaveProperty('name')
-//             expect(res.body).toHaveProperty('instance')
-//             expect(res.body).toHaveProperty('accountNumber')
-//             done()
-//         })
-//     })
-// })
