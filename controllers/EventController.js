@@ -28,8 +28,8 @@ class EventController {
     }
 
     static addEvent(req, res, next) {
-        const { name, status, participants, accounts, createdUserId } = req.body;
-        const event = new Event({ name, status, participants, accounts, createdUserId });
+        const { name, photo, status, participants, accounts, createdUserId } = req.body;
+        const event = new Event({ name, photo, status, participants, accounts, createdUserId });
         event.save()
             .then(() => {
                 res.status(201).json({
@@ -42,9 +42,9 @@ class EventController {
     } 
 
     static updateEvent(req, res, next) {
-        const { name, status, participants, accounts, createdUserId } = req.body;
+        const { name, photo, status, participants, accounts, createdUserId } = req.body;
 
-        Event.updateOne({_id: ObjectId(req.params.id)}, { name, status, participants, accounts, createdUserId })
+        Event.updateOne({_id: ObjectId(req.params.id)}, { name, photo, status, participants, accounts, createdUserId })
             .then(resUpdate => {
                 res.status(200).json({
                     resUpdate
