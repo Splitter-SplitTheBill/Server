@@ -4,14 +4,7 @@ module.exports = function (error, req, res, next) {
 
     if(error.name === 'JsonWebTokenError') {
         status = 400;
-        message = ['Please login first!'];
-    } else if(error.name === 'ValidationError') {
-        status = 400;
-        const arr = [];
-        for(const key in error) {
-            arr.push(error.errors[key].message);
-        }
-        message = arr;
+        message = 'Please login first!';
     } else {
         status = error.status || 500;
         message = error.message || 'Internal server error';
