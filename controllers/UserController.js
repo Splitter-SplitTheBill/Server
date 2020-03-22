@@ -20,7 +20,6 @@ class UserController {
                 findOne({ _id: user._id }).
                 populate('friendList.userId').
                 exec(function (err, userPopulate) {
-                    console.log('user', userPopulate)
                     if (err) return handleError(err);
                     res.status(201).json({
                         _id: userPopulate._id,
@@ -139,7 +138,22 @@ class UserController {
             }
         )
         .then(user => {
-            res.status(200).json(user);
+            User.
+                findOne({ _id: user._id }).
+                populate('friendList.userId').
+                exec(function (err, userPopulate) {
+                    if (err) return handleError(err);
+                    res.status(200).json({
+                        _id: userPopulate._id,
+                        name: userPopulate.name,
+                        email: userPopulate.email,
+                        username: userPopulate.username,
+                        accounts: userPopulate.accounts,
+                        friendList: userPopulate.friendList,
+                        image_url: userPopulate.image_url,
+                    });
+                });
+            // res.status(200).json(user);
         })
         .catch(next)
     }
