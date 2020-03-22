@@ -1,19 +1,55 @@
 const request = require('supertest')
 const app = require('../app')
+const ObjectId = require('mongoose').Types.ObjectId;
+const TransactionModel = require('../models/transaction')
 let transactionMock
-let userMock
+let userMock = {
+    _id: ObjectId('5e77191f97ed86369f7d2bfa')
+}
 let eventMock
 
-// beforeAll((done) => {
-//     request(app)
-//         .post('/transactions')
-//         .end((err, res) => {
-//             transactionMock = res.body.transaction
-//             userMock = res.body.user
-//             eventMock = res.body.event
-//             done()
-//         })
-// });
+beforeAll((done) => {
+    request(app)
+        .post('/events')
+        .send({
+            name: 'Makan nasi padang dipondok indah',
+                photo: "www.poto.com",
+                participants: [
+                    {
+                        participantId: ObjectId("123456789012"),
+                        transactionId: ObjectId("123456789012")
+                    },
+                    {
+                        participantId: ObjectId("123456789012"),
+                        transactionId: ObjectId("123456789012")
+                    }
+                ],
+                accounts: [
+                    {
+                        name: "BCA",
+                        instance: "A/n Ucok",
+                        accountNumber: "65301298391"
+                    },
+                    {
+                        name: "Ovoo",
+                        instance: "A/n 0812039012",
+                        accountNumber: "0812039012"
+                    },
+                    {
+                        name: "Gopay",
+                        instance: "A/n 0812039012",
+                        accountNumber: "0812039012"
+                    },
+                ],
+                createdUserId: '5e77191f97ed86369f7d2bff'
+        })
+        .end((err, res) => {
+            if(err) done(err)
+            eventMock = res.body.event
+            transactionMock = res.body.transactions[0]
+            done()
+        })
+});
 
 describe('GET /transactions/:transactionId (SUCCESS)', () => {
     it('should return status(200) and object containing transaction details', (done) => {
@@ -86,7 +122,6 @@ describe('GET /transactions/user/:userId (SUCCESS)', () => {
             .expect(200)
             .end((err, res) => {
                 if (err) done(err)
-                // console.log(res.body, '<<<<<<<<<<<<<')
                 expect(res.body[0]).toHaveProperty('_id')
                 expect(res.body[0]).toHaveProperty('userId')
                 expect(res.body[0]).toHaveProperty('total')
@@ -138,4 +173,8 @@ describe('PATCH /transactions/:eventId/:userId (Error)', () => {
                 done()
             })
     })
+})
+
+afterAll( async () => {
+    await TransactionModel.deleteMany()
 })

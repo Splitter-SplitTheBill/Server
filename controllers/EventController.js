@@ -1,7 +1,6 @@
 const Event         = require('../models/event');
 const mongoose      = require('mongoose');
 const ObjectId      = mongoose.Types.ObjectId;
-
 const { getItems }  = require('../helpers/extractText');
 
 class EventController {
@@ -26,13 +25,36 @@ class EventController {
     }
 
     static addEvent(req, res, next) {
+        let newEvent
         const { name, photo, status, participants, accounts, createdUserId } = req.body;
         const event = new Event({ name, photo, status, participants, accounts, createdUserId });
         event.save()
-            .then(() => {
+            .then((createdEvent) => {
+                newEvent = createdEvent
+                let transactions = []
+                transactionData.forEach(transactionItem => {
+                    transactions.push(transcationModel.create({
+                        userId: '5e77191f97ed86369f7d2bfa',
+                        items: [
+                            {
+                                name: 'Nasi Goreng',
+                                qty: 1,
+                                price: 11000
+                            }
+                        ],
+                        total: 11000,
+                        status: false,
+                        paymentSelection: newEvent.accounts,
+                        eventId: newEvent._id
+                    }))
+                })
+                return Promise.all(transactions)
+            })
+            .then(createdTransactions => {
                 res.status(201).json({
-                    message: 'Event has been added'
-                });
+                    event: newEvent,
+                    transactions: createdTransactions
+                })
             })
             .catch(next);    
     } 

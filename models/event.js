@@ -39,7 +39,7 @@ const eventSchema = new Schema({
         }]
     },
     createdUserId: {
-        type: Number
+        type: ObjectId
     }
 });
 

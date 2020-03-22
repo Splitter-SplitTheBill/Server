@@ -19,9 +19,7 @@ mongoose.connect(mongodb+dbName, {useNewUrlParser:true, useUnifiedTopology: true
 .then(success => {
     console.log('connected to MongoDb on ' + mongodb+dbName)
 })
-.catch(err => {
-    console.log(err)
-})
+
 
 app
     .use(cors())
