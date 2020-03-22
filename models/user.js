@@ -72,7 +72,10 @@ const UserSchema = new Schema ({
             type: Schema.Types.ObjectId,
             ref: 'User'
         }
-    }]
+    }],
+    image_url: {
+        type: String
+    }
 });
 
 UserSchema.pre('save', function(next) {
