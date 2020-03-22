@@ -1,6 +1,8 @@
-const Event     = require('../models/event');
-const mongoose  = require('mongoose');
-const ObjectId  = mongoose.Types.ObjectId;
+const Event         = require('../models/event');
+const mongoose      = require('mongoose');
+const ObjectId      = mongoose.Types.ObjectId;
+
+const { getItems }  = require('../helpers/extractText');
 
 class EventController {
     static listEvents(req, res, next) {
@@ -10,9 +12,7 @@ class EventController {
                     events
                 });
             })
-            .catch(err => {
-                next(err);
-            });
+            .catch(next);
     }
 
     static findEventById(req, res, next) {
@@ -22,9 +22,7 @@ class EventController {
                     event
                 });
             })
-            .catch(err => {
-                next(err)
-            });
+            .catch(next);
     }
 
     static addEvent(req, res, next) {
@@ -36,9 +34,7 @@ class EventController {
                     message: 'Event has been added'
                 });
             })
-            .catch(err => {
-                next(err)
-            });    
+            .catch(next);    
     } 
 
     static updateEvent(req, res, next) {
@@ -50,9 +46,7 @@ class EventController {
                     resUpdate
                 });            
             })
-            .catch(err => {
-                next(err);
-            });
+            .catch(next);
     }
 
     static deleteEvent(req, res, next) {
@@ -60,9 +54,23 @@ class EventController {
             .then(resDelete => {
                 res.status(200).json({resDelete});
             })
+            .catch(next);
+    }
+
+    static imgToArrTransactions(req, res, next) {
+        getItems('https://pbs.twimg.com/media/BC4dRKCCEAAZoPr.jpg')
+            .then(transactions => {
+                res.status(200).json({
+                    transactions,
+                    photo: req.body.photo
+                });
+            })
             .catch(err => {
-                next(err);
-            });
+                res.status(400).json({
+                    message: 'Transaction not found',
+                    err
+                });
+            })
     }
 }
 
