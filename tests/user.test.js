@@ -8,7 +8,8 @@ let registerOne = {
     password: 'onedirection',
     accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
                 { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
-    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }]
+    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+    image_url: './user.jpg'
 }
 let registerTwo = {
     name: 'Two Direction',
@@ -17,12 +18,15 @@ let registerTwo = {
     password: 'twodirection',
     accounts: [{ name: 'BRI', instance: 'BRI', accountNumber: '333333' },
                 { name: 'DANA', instance: 'DANA', accountNumber: '222222' }],
-    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }]
+    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+    image_url: './user.jpg'
 }
 let token
 let userId
 let username
 let unauthorizeToken
+let accountId
+let friendId
 
 beforeAll((done) => {
     request(app)
@@ -66,7 +70,8 @@ describe('POST /users/register - error email and username duplicate', () => {
             password: 'oneagain',
             accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
                         { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
-            friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }]
+            friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+            image_url: './user.jpg'
         })
         .expect(400)
         .end((err, res) => {
@@ -93,6 +98,11 @@ describe('POST /users/login - success', () => {
             userId = res.body._id
             username = res.body.username
             token = res.body.token
+            accountId = res.body.accounts[0]._id
+            console.log(res.body.accounts)
+            console.log('accountId',accountId)
+            friendId = res.body.friendList[0].userId
+            console.log('friendId', friendId)
             expect(typeof res.body).toBe('object')
             expect(res.body).toHaveProperty('_id')
             expect(res.body).toHaveProperty('name')
@@ -277,18 +287,17 @@ describe('GET /users/username/:username - username not found', () => {
     })
 })
 
-describe('PUT /users/:id - success', () => {
+describe('PATCH /users/:id - success', () => {
     it('should return status(200) and object containing user data', (done) => {
         request(app)
-        .put(`/users/${userId}`)
+        .patch(`/users/${userId}`)
         .set('token', token)
         .send({
             name: 'One Again',
-            email: 'one@mail.com',
-            username: 'one',
             accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
                         { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
-            friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }]
+            friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+            image_url: ''
         })
         .expect(200)
         .end((err, res) => {
@@ -296,11 +305,51 @@ describe('PUT /users/:id - success', () => {
             expect(typeof res.body).toBe('object')
             expect(res.body).toHaveProperty('_id')
             expect(res.body).toHaveProperty('name')
-            expect(res.body).toHaveProperty('email')
-            expect(res.body).toHaveProperty('username')
             expect(res.body).toHaveProperty('accounts')
             expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
             done()
         })
     })
 })
+
+describe('PATCH /users/:id/accounts - success', () => {
+    it('should return status(200) and object containing accounts data added', (done) => {
+        request(app)
+        .patch(`/users/${userId}/accounts`)
+        .set('token', token)
+        .send({
+            name: 'GOPAY',
+            instance: 'GOJEK',
+            accountNumber: '333333'
+        })
+        .expect(200)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body.succeeded).toBe('object')
+            // expect(res.body.succeeded).toHaveProperty('_id')
+            expect(res.body.succeeded).toHaveProperty('name')
+            expect(res.body.succeeded).toHaveProperty('instance')
+            expect(res.body.succeeded).toHaveProperty('accountNumber')
+            done()
+        })
+    })
+})
+
+// describe('PATCH /users/:id/accounts/:accountId - success', () => {
+//     it('should return status(200) and object containing accounts data deleted', (done) => {
+//         request(app)
+//         .patch(`/users/${userId}/accounts/${accountId}`)
+//         .set('token', token)
+//         .expect(200)
+//         .end((err, res) => {
+//             if(err) return done(err)
+//             expect(typeof res.body).toBe('object')
+//             expect(res.body).toHaveProperty('_id')
+//             expect(res.body).toHaveProperty('name')
+//             expect(res.body).toHaveProperty('instance')
+//             expect(res.body).toHaveProperty('accountNumber')
+//             done()
+//         })
+//     })
+// })

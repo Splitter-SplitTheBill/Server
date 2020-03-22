@@ -4,7 +4,7 @@ const { generateToken } = require('../middlewares/jwt');
 
 class UserController {
     static register(req, res, next) {
-        const { name, email, username, password, accounts, friendList, photo } = req.body;
+        const { name, email, username, password, accounts, friendList, image_url } = req.body;
         User.create({
             name,
             email,
@@ -12,7 +12,7 @@ class UserController {
             password,
             accounts,
             friendList,
-            photo
+            image_url
         })
         .then(user => {
             const token = generateToken({ _id: user._id, email: user.email });
@@ -23,6 +23,7 @@ class UserController {
                 username: user.username,
                 accounts: user.accounts,
                 friendList: user.friendList,
+                image_url: user.image_url,
                 token: token
             });
         })
@@ -53,6 +54,7 @@ class UserController {
                         username: user.username,
                         accounts: user.accounts,
                         friendList: user.friendList,
+                        image_url: user.image_url,
                         token: token
                     });
                 } else {
@@ -83,7 +85,7 @@ class UserController {
 
     static update(req, res, next) {
         const id = req.params.id
-        const { name, accounts, friendList } = req.body;
+        const { name, accounts, friendList, image_url } = req.body;
         User.findByIdAndUpdate(
             {
                 _id: id
@@ -91,7 +93,8 @@ class UserController {
             {
                 name,
                 accounts,
-                friendList
+                friendList,
+                image_url
             }
         )
         .then(user => {
@@ -130,6 +133,7 @@ class UserController {
                         }
                     )
                     .then(userUpdated => {
+                        console.log(userUpdated, '=============')
                         res.status(200).json({
                             succeeded: {
                                 name,
@@ -152,6 +156,7 @@ class UserController {
         // /users/:id/accounts/accountId
         const id = req.params.id
         const accountId = req.params.accountId
+        console.log(accountId,'###############')
         let accountIdFound = false
         let successRemove = {}
 
@@ -246,7 +251,6 @@ class UserController {
             if(user) {
                 user.friendList.map(el => {
                     if(el.userId.equals(friendId)) {
-                        console.log(el.userId)
                         userIdFound = true
                     }
                 })

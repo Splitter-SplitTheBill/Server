@@ -73,7 +73,7 @@ const UserSchema = new Schema ({
             ref: 'User'
         }
     }],
-    photo: {
+    image_url: {
         type: String
     }
 });
