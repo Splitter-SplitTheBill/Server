@@ -44,7 +44,15 @@ function paringItemToPrice(items, words) {
             let price = words[item[1]+onlyItems.length];
             // console.log(price);
             price = price.match( /\d+/g, '').join('');
-            itemsWithPrice.push([item[0], price]);
+
+            let totalQty = Number(item[0][0]);
+            if (totalQty <= 0 || isNaN(totalQty)) {
+                itemsWithPrice.push({name: item[0], price });
+            }else{                
+                for (let i = 0; i < totalQty; i++) {                                
+                    itemsWithPrice.push({name: item[0].slice(1), price: (price / totalQty) });
+                }
+            }
     });
 
     return itemsWithPrice;
@@ -61,7 +69,6 @@ async function getItems(imgUrl) {
         if (words.length > 0) {            
             let items = [];
     
-            let tempIndex = 0;
             words.map((word, index) => {
                 let splittedWords = word.split(" ");
                 let isItem;
@@ -81,13 +88,18 @@ async function getItems(imgUrl) {
 
             let itemWithPrice = paringItemToPrice(items, words);
             // console.log(words);
+            return itemWithPrice;
             console.log({itemWithPrice});
         }else{
             console.log('masuk kesini ' , result);
+            return;
         }
     } catch (error) {
         console.log('Error nih' , error);
+        return
     }
+
+
 }
 
 module.exports = {

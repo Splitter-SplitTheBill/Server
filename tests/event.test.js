@@ -25,7 +25,7 @@ beforeAll(async () => {
     }
 });
 
-describe('Testing API Event', () => {
+describe('Testing API Event (CRUD)', () => {
     it('Should return all events from database', async done => {
         const response = await request.get('/events');
     
@@ -140,14 +140,33 @@ describe('Testing API Event', () => {
         const response = await request.delete('/events/4edd40c86762e0fb12000003');
     
         expect(response.status).toBe(200);
-        expect(response.body.resDelete).toHaveProperty('ok');
-    
+        expect(response.body.resDelete).toHaveProperty('ok');    
         
         done();
     });
-});    
+});   
+
+describe('Testing OCR', () => {
+    it('should return array of object transactions and photo url', ( done ) => {
+        jest.setTimeout(60000);
+
+        request.post('/events/ocr')
+            .send({
+                photo: "www.poto.com"
+            })
+            .expect(200)
+            .end((err, response) => {
+                console.log(response.body);
+                expect(response.body).toHaveProperty('transactions');
+                expect(response.body).toHaveProperty('photo');
+                setTimeout(() => {                    
+                    done();        
+                }, 1000);
+            })        
+    });
+});
 
 afterAll(async () => {
-    // await Event.deleteMany();
+    await Event.deleteMany();
     // await mongoose.connection.close();
 });

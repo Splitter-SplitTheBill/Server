@@ -4,7 +4,8 @@ const upload            = require('../middlewares/unggah')
 
 route.get('/', EventController.listEvents);
 route.get('/:id', EventController.findEventById);
-route.post('/', upload.single('photo'), EventController.addEvent);
+route.post('/', EventController.addEvent);
+route.post('/ocr', upload.single('photo'), EventController.imgToArrTransactions);
 route.put('/:id', EventController.updateEvent);
 route.delete('/:id', EventController.deleteEvent);
 
