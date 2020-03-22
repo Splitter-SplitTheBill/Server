@@ -16,16 +16,23 @@ class UserController {
         })
         .then(user => {
             const token = generateToken({ _id: user._id, email: user.email });
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                username: user.username,
-                accounts: user.accounts,
-                friendList: user.friendList,
-                image_url: user.image_url,
-                token: token
-            });
+            User.
+                findOne({ _id: user._id }).
+                populate('friendList.userId').
+                exec(function (err, userPopulate) {
+                    console.log('user', userPopulate)
+                    if (err) return handleError(err);
+                    res.status(201).json({
+                        _id: userPopulate._id,
+                        name: userPopulate.name,
+                        email: userPopulate.email,
+                        username: userPopulate.username,
+                        accounts: userPopulate.accounts,
+                        friendList: userPopulate.friendList,
+                        image_url: userPopulate.image_url,
+                        token: token
+                    });
+                });
         })
         .catch(err => {
             // let arrayMessage = err.message.split(',')
@@ -47,16 +54,22 @@ class UserController {
             } else {
                 if(bcrypt.compareHash(password, user.password)) {
                     const token = generateToken({ _id: user._id, email: user.email });
-                    res.status(200).json({
-                        _id: user._id,
-                        name: user.name,
-                        email: user.email,
-                        username: user.username,
-                        accounts: user.accounts,
-                        friendList: user.friendList,
-                        image_url: user.image_url,
-                        token: token
-                    });
+                    User.
+                        findOne({ _id: user._id }).
+                        populate('friendList.userId').
+                        exec(function (err, userPopulate) {
+                            if (err) return handleError(err);
+                            res.status(200).json({
+                                _id: userPopulate._id,
+                                name: userPopulate.name,
+                                email: userPopulate.email,
+                                username: userPopulate.username,
+                                accounts: userPopulate.accounts,
+                                friendList: userPopulate.friendList,
+                                image_url: userPopulate.image_url,
+                                token: token
+                            });
+                        });
                 } else {
                     next({ status: 404, message: 'username/password wrong'});
                 }
@@ -69,7 +82,21 @@ class UserController {
         const id = req.params.id;
         User.findById(id)
         .then(user => {
-            res.status(200).json(user);
+            User.
+                findOne({ _id: user._id }).
+                populate('friendList.userId').
+                exec(function (err, userPopulate) {
+                    if (err) return handleError(err);
+                    res.status(200).json({
+                        _id: userPopulate._id,
+                        name: userPopulate.name,
+                        email: userPopulate.email,
+                        username: userPopulate.username,
+                        accounts: userPopulate.accounts,
+                        friendList: userPopulate.friendList,
+                        image_url: userPopulate.image_url,
+                    });
+                });
         })
         .catch(next)
     }
@@ -78,7 +105,21 @@ class UserController {
         const username = req.params.username;
         User.findOne({ username })
         .then(user => {
-            res.status(200).json(user);
+            User.
+                findOne({ _id: user._id }).
+                populate('friendList.userId').
+                exec(function (err, userPopulate) {
+                    if (err) return handleError(err);
+                    res.status(200).json({
+                        _id: userPopulate._id,
+                        name: userPopulate.name,
+                        email: userPopulate.email,
+                        username: userPopulate.username,
+                        accounts: userPopulate.accounts,
+                        friendList: userPopulate.friendList,
+                        image_url: userPopulate.image_url,
+                    });
+                });
         })
         .catch(next)
     }
