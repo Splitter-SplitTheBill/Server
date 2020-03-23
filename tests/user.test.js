@@ -1,6 +1,7 @@
 const request = require('supertest')
 const app = require('../app')
 
+const attachFile = `${__dirname}/Users-API-v2.png`
 let registerOne = {
     name: 'One Direction',
     email: 'one@mail.com',
@@ -9,7 +10,7 @@ let registerOne = {
     accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
                 { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
     friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
-    image_url: './user.jpg'
+    image_url: attachFile
 }
 let registerTwo = {
     name: 'Two Direction',
@@ -56,6 +57,7 @@ describe('POST /users/register - success', () => {
             expect(res.body).toHaveProperty('username')
             expect(res.body).toHaveProperty('accounts')
             expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
             expect(res.body).toHaveProperty('token')
             done()
         })
@@ -108,6 +110,7 @@ describe('POST /users/login - success', () => {
             expect(res.body).toHaveProperty('username')
             expect(res.body).toHaveProperty('accounts')
             expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
             expect(res.body).toHaveProperty('token')
             done()
         })
@@ -163,6 +166,7 @@ describe('GET /users:id - success', () => {
             expect(res.body).toHaveProperty('username')
             expect(res.body).toHaveProperty('accounts')
             expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
             done()
         })
     })
@@ -252,6 +256,7 @@ describe('GET /users/username/:username - success', () => {
             expect(res.body).toHaveProperty('username')
             expect(res.body).toHaveProperty('accounts')
             expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
             done()
         })
     })
