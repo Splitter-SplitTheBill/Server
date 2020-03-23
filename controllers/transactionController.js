@@ -1,4 +1,5 @@
 const transactionModel = require('../models/transaction')
+const eventModel = require('../models/event')
 var mongoose = require('mongoose');
 
 class TransactionController {
@@ -8,7 +9,7 @@ class TransactionController {
             if (transactionData) {
                 res.status(200).json(transactionData)
             } else {
-                next({
+                throw ({
                     status: 404,
                     message: 'Transaction Not Found'
                 })
@@ -27,7 +28,7 @@ class TransactionController {
             if (transactionData) {
                 res.status(200).json(transactionData)
             } else {
-                next({
+                throw ({
                     status: 404,
                     message: `Transaction Not Found`
                 })
@@ -47,7 +48,7 @@ class TransactionController {
             if (transactionData.length > 0) {
                 res.status(200).json(transactionData)
             } else {
-                next({
+                throw ({
                     status: 404,
                     message: `You don't have any transactions yet`
                 })
@@ -69,7 +70,7 @@ class TransactionController {
             if (updatedTransaction.nModified) {
                 res.status(200).json(updatedTransaction)
             } else {
-                next({
+                throw ({
                     status: 404,
                     message: 'Transaction Not Found'
                 })

@@ -1,5 +1,6 @@
 const request = require('supertest')
 const app = require('../app')
+const userModel = require('../models/user')
 
 const attachFile = `${__dirname}/Users-API-v2.png`
 let registerOne = {
@@ -207,7 +208,8 @@ describe('GET /users:id - invalid access token', () => {
         .end((err, res) => {
             if(err) return done(err)
             expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Invalid access')
+            // expect(res.body.message).toContain('Invalid access')
+            expect(res.body.message).toContain('Please login first!')
             done()
         })
     })
@@ -524,4 +526,7 @@ describe('PATCH /users/:id - success', () => {
             done()
         })
     })
+})
+afterAll( async () => {
+    await userModel.deleteMany()
 })
