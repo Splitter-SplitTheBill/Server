@@ -80,8 +80,9 @@ class EventController {
     }
 
     static imgToArrTransactions(req, res, next) {
-        getItems('https://pbs.twimg.com/media/BC4dRKCCEAAZoPr.jpg')
-            .then(transactions => {
+        getItems(req.body.photo)
+        .then(transactions => {
+            console.log(transactions)
                 res.status(200).json({
                     transactions,
                     photo: req.body.photo
