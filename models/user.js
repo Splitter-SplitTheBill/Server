@@ -23,9 +23,7 @@ const UserSchema = new Schema ({
                         return true;
                     }
                 })
-                .catch(err => {
-                    console.log('Validator error: ' +err);
-                });
+                .catch()
             },
             message: 'Email already exist'
         }
@@ -45,9 +43,7 @@ const UserSchema = new Schema ({
                         return true;
                     }
                 })
-                .catch(err => {
-                    console.log('Validator error: ' +err);
-                });
+                .catch()
             },
             message: 'Username already exist'
         }
