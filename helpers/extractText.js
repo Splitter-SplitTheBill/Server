@@ -3,12 +3,23 @@ const vision = require('@google-cloud/vision');
 
 // Creates a client
 const client = new vision.ImageAnnotatorClient({
-    keyFilename: 'helpers/secret_keys/ocr-google-vision.json'        
+    // keyFilename: 'helpers/secret_keys/ocr-google-vision.json'        
+    // untuk testing code gunakan ini, supaya bisa langsung jalankan node extractText.js
+    keyFilename: 'secret_keys/ocr-google-vision.json'     
 });
 
 function isValidItem(item) {
     // console.log(item);
-    let invalidItemCode = ["telp", "%", "+62", "jakarta", "jl.", "guest"];
+    let invalidItemCode = [
+        "telp", 
+        "%", 
+        "+62", "021", "140", "(021)", "(022)", "(031)", "(028)", "(0281)",
+        "jakarta", 
+        "jl", "jl.",
+        "guest", 
+        "no.", "tanggal", "meja"
+        // "jan", "feb", "mar", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "des"
+    ];
     for (let i = 0; i < invalidItemCode.length; i++) {
         if (item.toLowerCase().includes(invalidItemCode[i])) {
             return false;
@@ -32,18 +43,19 @@ function paringItemToPrice(items, words) {
         
     })
 
-    // console.log(onlyItems);
+    console.log({onlyItems});
 
     // process array item to their price
     onlyItems.map(item => {
-        // Untuk mendapatkan harga dari item
-        // maka perlu menjumlahkan index item dengan jumlah seluruh item
-        // agar dapat match ke pricenya yang terpisah
+            // Untuk mendapatkan harga dari item
+            // maka perlu menjumlahkan index item dengan jumlah seluruh item
+            // agar dapat match ke pricenya yang terpisah
+
             // karena format price ditiap struk berbeda, ada titik ada koma dsb, maka hanya ambil angkanya saja
             // Masukan data jadi ke array untuk dapat disimpan kedatabase
             let price = words[item[1]+onlyItems.length];
-            // console.log(price);
-            price = price.match( /\d+/g, '').join('');
+            price = price.match( /\d+/g, '');
+            price = price ? price.join('') : 0;
 
             let totalQty = Number(item[0][0]);
             if (totalQty <= 0 || isNaN(totalQty)) {
@@ -106,32 +118,20 @@ module.exports = {
     getItems
 }
 
-// const kafe          = 'https://img.solopos.com/posts/2018/04/01/907349/aaa.jpg?w=375&h=250';
-// const kfcSerius     = 'https://pbs.twimg.com/media/BozJBTJIQAEfxp4.jpg';
-// const kfcSerius2    = 'https://pbs.twimg.com/media/BC4dRKCCEAAZoPr.jpg';
-// const kfcSerius3    = 'https://pbs.twimg.com/media/By2Ran4CIAA3dSH.jpg';
-// const hokben        = 'https://assets-pergikuliner.com/uploads/image/picture/801607/picture-1516368440.JPG';
-// const gokana        = 'https://funtachi.files.wordpress.com/2013/02/35.jpg';
+const kafe          = 'https://img.solopos.com/posts/2018/04/01/907349/aaa.jpg?w=375&h=250';
+const kfcSerius     = 'https://pbs.twimg.com/media/BozJBTJIQAEfxp4.jpg';
+const kfcSerius2    = 'https://pbs.twimg.com/media/BC4dRKCCEAAZoPr.jpg';
+const kfcSerius3    = 'https://pbs.twimg.com/media/By2Ran4CIAA3dSH.jpg';
+const hokben        = 'https://assets-pergikuliner.com/uploads/image/picture/801607/picture-1516368440.JPG';
+const gokana        = 'https://funtachi.files.wordpress.com/2013/02/35.jpg';
+const upnormal      = 'https://media-cdn.tripadvisor.com/media/photo-s/0e/4a/dd/6a/struk.jpg';
+const aws           = 'https://jsprojectdev37.s3-ap-southeast-1.amazonaws.com/1584945069337-test.jpg';
+const dunkin        = 'https://2.bp.blogspot.com/-xc1miug9fA0/VscbBevwUjI/AAAAAAAAAFE/TQIKNxXlko8/s1600/WP_20160219_016%255B1%255D.jpg';
+const test          = 'https://jsprojectdev37.s3.ap-southeast-1.amazonaws.com/1584970320529-test.jpg';
 
-// setTimeout(() => {
-//     quickstart(kafe);
-// }, 1000);
-// setTimeout(() => {
-//     quickstart(kfcSerius);
-// }, 1000);
-
-// setTimeout(() => {
-//     quickstart(kfcSerius2);
-// }, 1000);
-
-// setTimeout(() => {
-//     quickstart(kfcSerius3);
-// }, 1000);
-
-// setTimeout(() => {
-//     quickstart(hokben);
-// }, 1000);
-
-// setTimeout(() => {
-//     quickstart(gokana);
-// }, 1000);
+setTimeout(() => {
+    getItems(test)
+        .then(items => {
+            console.log({items});
+        });
+}, 1000);
