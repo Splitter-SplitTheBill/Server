@@ -45,6 +45,6 @@ const transactionsSchema = new Schema({
     timestamps: true
 })
 
-const transactions = mongoose.model('Transactions', transactionsSchema)
+const transactions = mongoose.model('Transaction', transactionsSchema)
 
 module.exports = transactions

@@ -2,10 +2,14 @@ const Event         = require('../models/event');
 const mongoose      = require('mongoose');
 const ObjectId      = mongoose.Types.ObjectId;
 const { getItems }  = require('../helpers/extractText');
+const transactionModel = require('../models/transaction')
 
 class EventController {
     static listEvents(req, res, next) {
-        Event.find({})
+        Event.find({createdUserId: '5e78b2e7ab98c8a9c5cb94d8'})
+                    .populate('createdUserId', 'name email username')
+                    .populate('participants.transactionId')
+                    .populate('participants.participantId', 'name email username')
             .then(events => {
                 res.status(200).json({
                     events
@@ -26,23 +30,22 @@ class EventController {
 
     static addEvent(req, res, next) {
         let newEvent
-        const { name, photo, status, participants, accounts, createdUserId } = req.body;
-        const event = new Event({ name, photo, status, participants, accounts, createdUserId });
+        let returnTransactions
+        const { name, photo, accounts, createdUserId } = req.body;
+        const event = new Event({ name, photo, status: false, participants: [], accounts, createdUserId });
         event.save()
             .then((createdEvent) => {
                 newEvent = createdEvent
                 let transactions = []
-                transactionData.forEach(transactionItem => {
-                    transactions.push(transcationModel.create({
-                        userId: '5e77191f97ed86369f7d2bfa',
-                        items: [
-                            {
-                                name: 'Nasi Goreng',
-                                qty: 1,
-                                price: 11000
-                            }
-                        ],
-                        total: 11000,
+                req.body.participants.forEach(participant => {
+                    let totalTransaction = 0
+                    participant.items.forEach(item => {
+                        totalTransaction += item.price
+                    })
+                    transactions.push(transactionModel.create({
+                        userId: participant.userId,
+                        items: participant.items,
+                        total: totalTransaction,
                         status: false,
                         paymentSelection: newEvent.accounts,
                         eventId: newEvent._id
@@ -51,12 +54,32 @@ class EventController {
                 return Promise.all(transactions)
             })
             .then(createdTransactions => {
-                res.status(201).json({
-                    event: newEvent,
-                    transactions: createdTransactions
+                returnTransactions = createdTransactions
+                let fixedParticipants = []
+                createdTransactions.forEach(transaction => {
+                    fixedParticipants.push({participantId: transaction.userId, transactionId: transaction._id})
+                })
+                return Event.updateOne({
+                    _id: newEvent._id
+                }, {
+                    participants: fixedParticipants
                 })
             })
-            .catch(next);    
+            .then(updatedData => {
+                return Event.findOne({
+                    _id: newEvent._id
+                })
+                .populate('participants.transactionId')
+                .populate('participants.participantId')
+            })
+            .then(finalEventData => {
+                console.log(finalEventData)
+                res.status(201).json({
+                    event: finalEventData,
+                    transactions: returnTransactions
+                })
+            })
+            .catch(next)
     } 
 
     static updateEvent(req, res, next) {
@@ -80,9 +103,11 @@ class EventController {
     }
 
     static imgToArrTransactions(req, res, next) {
+        // console.log(req.body.photo)
         getItems(req.body.photo)
+        // getItems('https://testbucketokkalinardi.s3-ap-southeast-1.amazonaws.com/BC4dRKCCEAAZoPr.jpg')
         .then(transactions => {
-            console.log(transactions)
+            // console.log(transactions)
                 res.status(200).json({
                     transactions,
                     photo: req.body.photo
