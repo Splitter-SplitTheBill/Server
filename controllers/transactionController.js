@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 
 class TransactionController {
     static findTransactionByID (req, res, next) {
-        transactionModel.findById(req.params.transactionId).populate('userId').populate('eventId')
+        transactionModel.findById(req.params.transactionId).populate('userId', 'name email username').populate('eventId')
         .then(transactionData => {
             if (transactionData) {
                 res.status(200).json(transactionData)
@@ -23,7 +23,7 @@ class TransactionController {
     static findTransactionByEvent (req, res, next) {
         transactionModel.findOne({
             eventId: req.params.eventId
-        }).populate('userId').populate('eventId')
+        }).populate('userId', 'name email username').populate('eventId')
         .then(transactionData => {
             if (transactionData) {
                 res.status(200).json(transactionData)
@@ -43,7 +43,7 @@ class TransactionController {
     static findTransactionByUser (req, res, next) {
         transactionModel.find({
             userId: req.params.userId
-        }).populate('userId').populate('eventId')
+        }).populate('userId', 'name email username').populate('eventId')
         .then(transactionData => {
             if (transactionData.length > 0) {
                 res.status(200).json(transactionData)
