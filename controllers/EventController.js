@@ -6,7 +6,7 @@ const transactionModel = require('../models/transaction')
 
 class EventController {
     static listEvents(req, res, next) {
-        Event.find({createdUserId: '5e78b2e7ab98c8a9c5cb94d8'})
+        Event.find({createdUserId: req.userLoggedIn._id})
                     .populate('createdUserId', 'name email username')
                     .populate('participants.transactionId')
                     .populate('participants.participantId', 'name email username')
@@ -20,6 +20,9 @@ class EventController {
 
     static findEventById(req, res, next) {
         Event.findOne({_id: ObjectId(req.params.id)})
+                    .populate('createdUserId', 'name email username')
+                    .populate('participants.transactionId')
+                    .populate('participants.participantId', 'name email username')
             .then(event => {
                 res.status(200).json({
                     event
@@ -70,7 +73,7 @@ class EventController {
                     _id: newEvent._id
                 })
                 .populate('participants.transactionId')
-                .populate('participants.participantId')
+                .populate('participants.participantId', 'name email username')
             })
             .then(finalEventData => {
                 console.log(finalEventData)
