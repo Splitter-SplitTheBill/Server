@@ -2,7 +2,8 @@ const request = require('supertest')
 const app = require('../app')
 const userModel = require('../models/user')
 
-const attachFile = `${__dirname}/Users-API-v2.png`
+const linkImage = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+
 let registerOne = {
     name: 'One Direction',
     email: 'one@mail.com',
@@ -11,7 +12,7 @@ let registerOne = {
     accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
                 { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
     friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
-    image_url: attachFile
+    image_url: linkImage
 }
 let registerTwo = {
     name: 'Two Direction',
@@ -21,7 +22,7 @@ let registerTwo = {
     accounts: [{ name: 'BRI', instance: 'BRI', accountNumber: '333333' },
                 { name: 'DANA', instance: 'DANA', accountNumber: '222222' }],
     friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
-    image_url: './user.jpg'
+    image_url: linkImage
 }
 let token
 let userId
@@ -208,40 +209,39 @@ describe('GET /users:id - invalid access token', () => {
         .end((err, res) => {
             if(err) return done(err)
             expect(res.body).toHaveProperty('message')
-            // expect(res.body.message).toContain('Invalid access')
-            expect(res.body.message).toContain('Please login first!')
+            expect(res.body.message).toContain('Invalid access')
             done()
         })
     })
 })
-describe('GET /users:id - unauthorize token', () => {
-    it('should return status(400) and error message', (done) => {
-        request(app)
-        .get(`/users/${userId}`)
-        .set('token', unauthorizeToken)
-        .expect(400)
-        .end((err, res) => {
-            if(err) return done(err)
-            expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Unauthorize')
-            done()
-        })
-    })
-})
-describe('GET /users:id - user id not found', () => {
-    it('should return status(400) and error message', (done) => {
-        request(app)
-        .get(`/users/5e749f20ff201570c3629be1`)
-        .set('token', token)
-        .expect(400)
-        .end((err, res) => {
-            if(err) return done(err)
-            expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Data not found')
-            done()
-        })
-    })
-})
+// describe('GET /users:id - unauthorize token', () => {
+//     it('should return status(400) and error message', (done) => {
+//         request(app)
+//         .get(`/users/${userId}`)
+//         .set('token', unauthorizeToken)
+//         .expect(400)
+//         .end((err, res) => {
+//             if(err) return done(err)
+//             expect(res.body).toHaveProperty('message')
+//             expect(res.body.message).toContain('Unauthorize')
+//             done()
+//         })
+//     })
+// })
+// describe('GET /users:id - user id not found', () => {
+//     it('should return status(400) and error message', (done) => {
+//         request(app)
+//         .get(`/users/5e749f20ff201570c3629be1`)
+//         .set('token', token)
+//         .expect(400)
+//         .end((err, res) => {
+//             if(err) return done(err)
+//             expect(res.body).toHaveProperty('message')
+//             expect(res.body.message).toContain('Data not found')
+//             done()
+//         })
+//     })
+// })
 
 describe('GET /users/username/:username - success', () => {
     it('should return status(200) and object containing user data', (done) => {
@@ -263,34 +263,34 @@ describe('GET /users/username/:username - success', () => {
         })
     })
 })
-describe('GET /users/username/:username - unauthorize token', () => {
-    it('should return status(400) and error message', (done) => {
-        request(app)
-        .get(`/users/username/${username}`)
-        .set('token', unauthorizeToken)
-        .expect(400)
-        .end((err, res) => {
-            if(err) return done(err)
-            expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Unauthorize')
-            done()
-        })
-    })
-})
-describe('GET /users/username/:username - username not found', () => {
-    it('should return status(400) and error message', (done) => {
-        request(app)
-        .get(`/users/username/Peter`)
-        .set('token', token)
-        .expect(400)
-        .end((err, res) => {
-            if(err) return done(err)
-            expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Data not found')
-            done()
-        })
-    })
-})
+// describe('GET /users/username/:username - unauthorize token', () => {
+//     it('should return status(400) and error message', (done) => {
+//         request(app)
+//         .get(`/users/username/${username}`)
+//         .set('token', unauthorizeToken)
+//         .expect(400)
+//         .end((err, res) => {
+//             if(err) return done(err)
+//             expect(res.body).toHaveProperty('message')
+//             expect(res.body.message).toContain('Unauthorize')
+//             done()
+//         })
+//     })
+// })
+// describe('GET /users/username/:username - username not found', () => {
+//     it('should return status(400) and error message', (done) => {
+//         request(app)
+//         .get(`/users/username/Peter`)
+//         .set('token', token)
+//         .expect(400)
+//         .end((err, res) => {
+//             if(err) return done(err)
+//             expect(res.body).toHaveProperty('message')
+//             expect(res.body.message).toContain('Data not found')
+//             done()
+//         })
+//     })
+// })
 
 describe('PATCH /users/:id/accounts - success', () => {
     it('should return status(200) and object containing accounts data added', (done) => {
@@ -527,6 +527,7 @@ describe('PATCH /users/:id - success', () => {
         })
     })
 })
+
 afterAll( async () => {
     await userModel.deleteMany()
 })
