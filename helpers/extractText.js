@@ -3,9 +3,9 @@ const vision = require('@google-cloud/vision');
 
 // Creates a client
 const client = new vision.ImageAnnotatorClient({
-    // keyFilename: 'helpers/secret_keys/ocr-google-vision.json'        
+    keyFilename: 'helpers/secret_keys/ocr-google-vision.json'        
     // untuk testing code gunakan ini, supaya bisa langsung jalankan node extractText.js
-    keyFilename: 'secret_keys/ocr-google-vision.json'     
+    // keyFilename: 'secret_keys/ocr-google-vision.json'     
 });
 
 function isValidItem(item) {
