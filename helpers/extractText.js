@@ -127,11 +127,11 @@ const gokana        = 'https://funtachi.files.wordpress.com/2013/02/35.jpg';
 const upnormal      = 'https://media-cdn.tripadvisor.com/media/photo-s/0e/4a/dd/6a/struk.jpg';
 const aws           = 'https://jsprojectdev37.s3-ap-southeast-1.amazonaws.com/1584945069337-test.jpg';
 const dunkin        = 'https://2.bp.blogspot.com/-xc1miug9fA0/VscbBevwUjI/AAAAAAAAAFE/TQIKNxXlko8/s1600/WP_20160219_016%255B1%255D.jpg';
-const test          = 'https://jsprojectdev37.s3.ap-southeast-1.amazonaws.com/1584970320529-test.jpg';
+// const test          = 'https://jsprojectdev37.s3.ap-southeast-1.amazonaws.com/1584970320529-test.jpg';
 
-setTimeout(() => {
-    getItems(test)
-        .then(items => {
-            console.log({items});
-        });
-}, 1000);
+// setTimeout(() => {
+//     getItems(test)
+//         .then(items => {
+//             console.log({items});
+//         });
+// }, 1000);

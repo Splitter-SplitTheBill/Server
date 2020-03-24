@@ -16,10 +16,10 @@ class UserController {
         })
         .then(user => {
             const token = generateToken({ _id: user._id, email: user.email });
-            User.
-                findOne({ _id: user._id }).
-                populate('friendList.userId').
-                exec(function (err, userPopulate) {
+            User
+                .findOne({ _id: user._id })
+                .populate('friendList.userId')
+                .exec(function (err, userPopulate) {
                     if (err) return handleError(err);
                     res.status(201).json({
                         _id: userPopulate._id,
@@ -53,10 +53,10 @@ class UserController {
             } else {
                 if(bcrypt.compareHash(password, user.password)) {
                     const token = generateToken({ _id: user._id, email: user.email });
-                    User.
-                        findOne({ _id: user._id }).
-                        populate('friendList.userId').
-                        exec(function (err, userPopulate) {
+                    User
+                        .findOne({ _id: user._id })
+                        .populate('friendList.userId')
+                        .exec(function (err, userPopulate) {
                             if (err) return handleError(err);
                             res.status(200).json({
                                 _id: userPopulate._id,
@@ -81,10 +81,10 @@ class UserController {
         const id = req.params.id;
         User.findById(id)
         .then(user => {
-            User.
-                findOne({ _id: user._id }).
-                populate('friendList.userId').
-                exec(function (err, userPopulate) {
+            User
+                .findOne({ _id: user._id })
+                .populate('friendList.userId')
+                .exec(function (err, userPopulate) {
                     if (err) return handleError(err);
                     res.status(200).json({
                         _id: userPopulate._id,
@@ -104,10 +104,10 @@ class UserController {
         const username = req.params.username;
         User.findOne({ username })
         .then(user => {
-            User.
-                findOne({ _id: user._id }).
-                populate('friendList.userId').
-                exec(function (err, userPopulate) {
+            User
+                .findOne({ _id: user._id })
+                .populate('friendList.userId')
+                .exec(function (err, userPopulate) {
                     if (err) return handleError(err);
                     res.status(200).json({
                         _id: userPopulate._id,
@@ -138,10 +138,10 @@ class UserController {
             }
         )
         .then(user => {
-            User.
-                findOne({ _id: user._id }).
-                populate('friendList.userId').
-                exec(function (err, userPopulate) {
+            User
+                .findOne({ _id: user._id })
+                .populate('friendList.userId')
+                .exec(function (err, userPopulate) {
                     if (err) return handleError(err);
                     res.status(200).json({
                         _id: userPopulate._id,
@@ -153,7 +153,6 @@ class UserController {
                         image_url: userPopulate.image_url,
                     });
                 });
-            // res.status(200).json(user);
         })
         .catch(next)
     }
@@ -188,14 +187,21 @@ class UserController {
                         }
                     )
                     .then(userUpdated => {
-                        res.status(200).json({
-                            userUpdated,
-                            succeeded: {
-                                name,
-                                instance,
-                                accountNumber
-                            }
-                        })
+                        User
+                            .findOne({ _id: id })
+                            .populate('friendList.userId')
+                            .exec(function (err, userPopulate) {
+                                if (err) return handleError(err);
+                                res.status(200).json({
+                                    _id: userPopulate._id,
+                                    name: userPopulate.name,
+                                    email: userPopulate.email,
+                                    username: userPopulate.username,
+                                    accounts: userPopulate.accounts,
+                                    friendList: userPopulate.friendList,
+                                    image_url: userPopulate.image_url,
+                                });
+                            });
                     })
                 } else {
                     next({ status: 400, message: 'All data already exist' })
@@ -241,15 +247,29 @@ class UserController {
                             }
                         }
                     )
+                    .then(success => {
+                        User
+                            .findOne({ _id: id })
+                            .populate('friendList.userId')
+                            .exec(function (err, userPopulate) {
+                                if (err) return handleError(err);
+                                res.status(200).json({
+                                    _id: userPopulate._id,
+                                    name: userPopulate.name,
+                                    email: userPopulate.email,
+                                    username: userPopulate.username,
+                                    accounts: userPopulate.accounts,
+                                    friendList: userPopulate.friendList,
+                                    image_url: userPopulate.image_url,
+                                });
+                            });
+                    })
                 } else {
                     next({ status: 400, message: 'AccountId not found' })
                 }
             } else {
                 next({ status: 400, message: 'UserId not found' })
             }
-        })
-        .then(success => {
-            res.status(200).json({ success, successRemove })
         })
         .catch(next)
     }
@@ -283,13 +303,27 @@ class UserController {
                             }
                         }
                     )
+                    .then(success => {
+                        User
+                            .findOne({ _id: id })
+                            .populate('friendList.userId')
+                            .exec(function (err, userPopulate) {
+                                if (err) return handleError(err);
+                                res.status(200).json({
+                                    _id: userPopulate._id,
+                                    name: userPopulate.name,
+                                    email: userPopulate.email,
+                                    username: userPopulate.username,
+                                    accounts: userPopulate.accounts,
+                                    friendList: userPopulate.friendList,
+                                    image_url: userPopulate.image_url,
+                                });
+                            });
+                    })
                 }
             } else {
                 next({ status: 400, message: 'UserId not found' })
             }
-        })
-        .then(success => {
-            res.status(200).json({ success, userId: friendId })
         })
         .catch(next)
     }
@@ -322,7 +356,21 @@ class UserController {
                         }
                     )
                     .then(success => {
-                        res.status(200).json({ success, userId: friendId })
+                        User
+                            .findOne({ _id: id })
+                            .populate('friendList.userId')
+                            .exec(function (err, userPopulate) {
+                                if (err) return handleError(err);
+                                res.status(200).json({
+                                    _id: userPopulate._id,
+                                    name: userPopulate.name,
+                                    email: userPopulate.email,
+                                    username: userPopulate.username,
+                                    accounts: userPopulate.accounts,
+                                    friendList: userPopulate.friendList,
+                                    image_url: userPopulate.image_url,
+                                });
+                            });
                     })
                 } else {
                     next({ status: 400, message: 'FriendId not found' })
