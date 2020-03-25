@@ -4,7 +4,7 @@ const upload            = require('../middlewares/unggah')
 const { authentication }  = require('../middlewares/authentication')
 const uploadGcs         = require('../middlewares/unggah-gcs');
 
-route.get('/', authentication, EventController.listEvents);
+route.get('/', EventController.listEvents);
 route.get('/:id', EventController.findEventById);
 route.post('/', EventController.addEvent);
 route.post('/ocr', uploadGcs.single('photo'), EventController.imgToArrTransactions);

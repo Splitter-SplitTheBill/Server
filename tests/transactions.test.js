@@ -1,12 +1,59 @@
-const request = require('supertest')
 const app = require('../app')
-const ObjectId = require('mongoose').Types.ObjectId;
+const request = require('supertest')
 const TransactionModel = require('../models/transaction')
-let transactionMock
-let userMock = {
-    _id: ObjectId('5e77191f97ed86369f7d2bfa')
-}
+const ObjectId = require('mongoose').Types.ObjectId;
+// let userMock = {
+    // _id: ObjectId('5e77191f97ed86369f7d2bfa')
+    // }
 let eventMock
+let transactionMock
+
+const userModel = require('../models/user')
+const eventModel = require('../models/event')
+const linkImage = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+let registerOne = {
+    name: 'One Direction',
+    email: 'one@mail.com',
+    username: 'one',
+    password: 'onedirection',
+    accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
+                { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
+    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+    image_url: linkImage
+}
+let registerTwo = {
+    name: 'Two Direction',
+    email: 'two@mail.com',
+    username: 'two',
+    password: 'twodirection',
+    accounts: [{ name: 'BRI', instance: 'BRI', accountNumber: '333333' },
+                { name: 'DANA', instance: 'DANA', accountNumber: '222222' }],
+    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+    image_url: linkImage
+}
+let userId_1
+let userId_2
+
+beforeAll((done) => {
+    request(app)
+    .post('/users/register')
+    .send(registerOne)
+    .end((err, res) => {
+        if(err) return done(err)
+        userId_1 = res.body._id
+    })
+
+    request(app)
+    .post('/users/register')
+    .send(registerTwo)
+    .end((err, res) => {
+        if(err) return done(err)
+        userId_2 = res.body._id
+        done()
+    })
+})
+userId_1 = ObjectId(userId_1)
+userId_2 = ObjectId(userId_2)
 
 beforeAll((done) => {
     request(app)
@@ -16,12 +63,34 @@ beforeAll((done) => {
                 photo: "www.poto.com",
                 participants: [
                     {
-                        participantId: ObjectId("123456789012"),
-                        transactionId: ObjectId("123456789012")
+                        userId: (userId_1),
+                        items: [
+                            {
+                                item: 'nasi',
+                                qty: 1,
+                                price: 7000
+                            },
+                            {
+                                item: 'rendang',
+                                qty: 1,
+                                price: 17000
+                            }
+                        ]
                     },
                     {
-                        participantId: ObjectId("123456789012"),
-                        transactionId: ObjectId("123456789012")
+                        userId: (userId_2),
+                        items: [
+                            {
+                                item: 'nasi',
+                                qty: 1,
+                                price: 7000
+                            },
+                            {
+                                item: 'telor',
+                                qty: 1,
+                                price: 10000
+                            }
+                        ]
                     }
                 ],
                 accounts: [
@@ -41,12 +110,12 @@ beforeAll((done) => {
                         accountNumber: "0812039012"
                     },
                 ],
-                createdUserId: '5e77191f97ed86369f7d2bff'
+                createdUserId: (userId_1)
         })
         .end((err, res) => {
             if(err) done(err)
             eventMock = res.body.event
-            transactionMock = res.body.transactions[0]
+            transactionMock = res.body.transactions
             done()
         })
 });
@@ -54,7 +123,7 @@ beforeAll((done) => {
 describe('GET /transactions/:transactionId (SUCCESS)', () => {
     it('should return status(200) and object containing transaction details', (done) => {
         request(app)
-            .get('/transactions/' + transactionMock._id)
+            .get('/transactions/' + transactionMock[0]._id)
             .expect(200)
             .end((err, res) => {
                 if (err) done(err)
@@ -118,7 +187,7 @@ describe('GET /transactions/event/:eventId (Error)', () => {
 describe('GET /transactions/user/:userId (SUCCESS)', () => {
     it('should return status(200) and object containing transaction details', (done) => {
         request(app)
-            .get('/transactions/user/' + userMock._id)
+            .get('/transactions/user/' + userId_1)
             .expect(200)
             .end((err, res) => {
                 if (err) done(err)
@@ -147,15 +216,24 @@ describe('GET /transactions/user/:userId (Error)', () => {
     })
 })
 
-
 describe('PATCH /transactions/:eventId/:userId (SUCCESS)', () => {
     it('should return status(200) and object containing number of modified data', (done) => {
         request(app)
-            .patch(`/transactions/${eventMock._id}/${userMock._id}`)
+            .patch(`/transactions/${eventMock._id}/${userId_1}`)
+            .send({ status: 'true' })
             .expect(200)
             .end((err, res) => {
                 if (err) done(err)
-                expect(res.body).toHaveProperty('nModified')
+                expect(typeof res.body).toBe('object')
+                expect(res.body).toHaveProperty('_id')
+                expect(res.body).toHaveProperty('name')
+                expect(res.body).toHaveProperty('photo')
+                expect(res.body).toHaveProperty('status')
+                expect(res.body).toHaveProperty('participants')
+                expect(typeof res.body.participants).toBe('object')
+                expect(res.body).toHaveProperty('accounts')
+                expect(typeof res.body.accounts).toBe('object')
+                expect(res.body).toHaveProperty('createdUserId')
                 done()
             })
     })
@@ -165,6 +243,7 @@ describe('PATCH /transactions/:eventId/:userId (Error)', () => {
     it('should return status(404) and object containing message', (done) => {
         request(app)
             .patch('/transactions/5e748b8d3263399d9d7c255f/5e748b8d3263399d9d7c255f')
+            .send({ status: 'true' })
             .expect(404)
             .end((err, res) => {
                 if (err) done(err)
@@ -177,4 +256,6 @@ describe('PATCH /transactions/:eventId/:userId (Error)', () => {
 
 afterAll( async () => {
     await TransactionModel.deleteMany()
+    await userModel.deleteMany()
+    await eventModel.deleteMany()
 })
