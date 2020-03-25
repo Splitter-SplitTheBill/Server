@@ -23,7 +23,7 @@ const transactionsSchema = new Schema({
         type: Number
     },
     status: {
-        type: Boolean
+        type: String
     },
     eventId: {
         type: Schema.Types.ObjectId,
