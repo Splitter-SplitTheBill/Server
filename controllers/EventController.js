@@ -7,9 +7,9 @@ const transactionModel = require('../models/transaction')
 class EventController {
     static listEvents(req, res, next) {
         Event.find({createdUserId: req.userLoggedIn._id})
-                    .populate('createdUserId', 'name email username')
+                    .populate('createdUserId', 'name email username image_url')
                     .populate('participants.transactionId')
-                    .populate('participants.participantId', 'name email username')
+                    .populate('participants.participantId', 'name email username image_url')
             .then(events => {
                 res.status(200).json({
                     events
@@ -20,9 +20,9 @@ class EventController {
 
     static findEventById(req, res, next) {
         Event.findOne({_id: ObjectId(req.params.id)})
-                    .populate('createdUserId', 'name email username')
+                    .populate('createdUserId', 'name email username image_url')
                     .populate('participants.transactionId')
-                    .populate('participants.participantId', 'name email username')
+                    .populate('participants.participantId', 'name email username image_url')
             .then(event => {
                 res.status(200).json({
                     event
@@ -49,7 +49,7 @@ class EventController {
                         userId: participant.userId,
                         items: participant.items,
                         total: totalTransaction,
-                        status: false,
+                        status: 'unpaid',
                         paymentSelection: newEvent.accounts,
                         eventId: newEvent._id
                     }))
@@ -73,7 +73,7 @@ class EventController {
                     _id: newEvent._id
                 })
                 .populate('participants.transactionId')
-                .populate('participants.participantId', 'name email username')
+                .populate('participants.participantId', 'name email username image_url')
             })
             .then(finalEventData => {
                 console.log(finalEventData)
@@ -108,7 +108,7 @@ class EventController {
     static imgToArrTransactions(req, res, next) {
         // console.log(req.body.photo)
         getItems(req.body.photo)
-        // getItems('https://testbucketokkalinardi.s3-ap-southeast-1.amazonaws.com/BC4dRKCCEAAZoPr.jpg')
+        // getItems('https://storage.cloud.google.com/forocrtest/1585043446579-test.jpg')
         .then(transactions => {
             // console.log(transactions)
                 res.status(200).json({

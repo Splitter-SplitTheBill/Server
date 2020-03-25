@@ -64,13 +64,13 @@ class TransactionController {
             eventId: req.params.eventId,
             userId: req.params.userId
         },{
-            status: true
+            status: req.body.status.toLowerCase()
         })
         .then(updatedTransaction => {
             if (updatedTransaction.nModified) {
                 return eventModel.findOne({
                     _id: req.params.eventId
-                })
+                }).populate('participants.transactionId').populate('participants.participantId', 'name email username image_url')
             } else {
                 throw ({
                     status: 404,
@@ -79,7 +79,7 @@ class TransactionController {
             }
         })
         .then(updatedEventData => {
-            console.log(updatedEventData)
+            console.log(updatedEventData, '<<<<<<<<<<<<<')
             res.status(200).json(updatedEventData)
         })
         .catch(err => {
