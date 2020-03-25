@@ -3,16 +3,15 @@ const unggah = require('unggah')
 const storage = unggah.gcs({
     keyFilename: 'middlewares/secret_keys/ocr-split-bill-5fd6255b2b6c-key.json',
     bucketName: 'split-bill-bucket',
-    rename: (req, file) => {
-      return `${Date.now()}-${file.originalname}`  // this is the default
-    }
+    // rename: (req, file) => {
+    //   return `${Date.now()}-${file.originalname}`  // this is the default
+    // }
 });
 
 const upload = unggah({
     storage: storage // storage configuration for google cloud storage or S3
 })
 module.exports = upload
-
 
 
 // function upload(filename) {

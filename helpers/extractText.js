@@ -46,7 +46,7 @@ function paringItemToPrice(items, words) {
         
     })
 
-    console.log({onlyItems});
+    // console.log({onlyItems});
 
     // process array item to their price
     onlyItems.map(item => {
@@ -112,7 +112,6 @@ async function getItems(imgUrl) {
     } catch (error) {
         return error;
     }
-
 
 }
 

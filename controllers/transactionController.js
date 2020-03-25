@@ -79,7 +79,6 @@ class TransactionController {
             }
         })
         .then(updatedEventData => {
-            console.log(updatedEventData, '<<<<<<<<<<<<<')
             res.status(200).json(updatedEventData)
         })
         .catch(err => {
