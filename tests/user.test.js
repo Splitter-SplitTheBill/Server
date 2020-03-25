@@ -208,7 +208,7 @@ describe('GET /users:id - invalid access token', () => {
         .end((err, res) => {
             if(err) return done(err)
             expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Invalid access')
+            expect(res.body.message).toContain('Please login first!')
             done()
         })
     })

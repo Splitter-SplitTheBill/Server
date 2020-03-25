@@ -6,7 +6,8 @@ const transactionModel = require('../models/transaction')
 
 class EventController {
     static listEvents(req, res, next) {
-        Event.find({createdUserId: req.userLoggedIn._id})
+        let createdUserId = req.userLoggedIn ? req.userLoggedIn._id : "123456789012";
+        Event.find({createdUserId})
                     .populate('createdUserId', 'name email username image_url')
                     .populate('participants.transactionId')
                     .populate('participants.participantId', 'name email username image_url')

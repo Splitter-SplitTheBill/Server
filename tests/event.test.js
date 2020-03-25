@@ -10,6 +10,21 @@ const request   = supertest(app);
 const dbName    = 'splitter-test';
 
 const Event     = require('../models/event');
+const User      = require('../models/user');
+
+const linkImage = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+
+let registerOne = {
+    name: 'One Direction',
+    email: 'one@mail.com',
+    username: 'one',
+    password: 'onedirection',
+    accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
+                { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
+    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
+    image_url: linkImage
+}
+
 
 beforeAll(async () => {
     // Connect to a Mongo DB
@@ -18,11 +33,58 @@ beforeAll(async () => {
         await mongoose.connect(url, {
             useNewUrlParser: true,
             useUnifiedTopology: true
-        });  
+        });          
     } catch (error) {
         console.log(`database error connecting...`);
         console.log(error);
     }
+});
+
+
+describe('Register & Login', () => {
+    it('should return status(201) and object containing user data', (done) => {
+        request.post('/users/register')
+        .send(registerOne)
+        .expect(201)
+        .end((err, res) => {
+            if(err) return done(err)
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('_id')
+            expect(res.body).toHaveProperty('name')
+            expect(res.body).toHaveProperty('email')
+            expect(res.body).toHaveProperty('username')
+            expect(res.body).toHaveProperty('accounts')
+            expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
+            expect(res.body).toHaveProperty('token')
+            done()
+        })
+    })    
+    it('should return status(200) and object containing user data', (done) => {
+        request.post('/users/login')
+        .send({
+            username: registerOne.username,
+            password: registerOne.password
+        })
+        .expect(200)
+        .end((err, res) => {
+            if(err) return done(err)
+            userId = res.body._id
+            username = res.body.username
+            token = res.body.token
+            accountId = res.body.accounts[0]._id
+            expect(typeof res.body).toBe('object')
+            expect(res.body).toHaveProperty('_id')
+            expect(res.body).toHaveProperty('name')
+            expect(res.body).toHaveProperty('email')
+            expect(res.body).toHaveProperty('username')
+            expect(res.body).toHaveProperty('accounts')
+            expect(res.body).toHaveProperty('friendList')
+            expect(res.body).toHaveProperty('image_url')
+            expect(res.body).toHaveProperty('token')
+            done()
+        })
+    })
 });
 
 describe('Testing API Event (CRUD)', () => {
@@ -48,15 +110,17 @@ describe('Testing API Event (CRUD)', () => {
         const response = await request.post('/events')
             .send({
                 name: 'Makan nasi padang dipondok indah',
-                photo: "www.poto.com",
+                photo: "gs://split-bill-bucket/1.jpg",
                 participants: [
                     {
                         participantId: ObjectId("123456789012"),
-                        transactionId: ObjectId("123456789012")
+                        transactionId: ObjectId("123456789012"),
+                        items: []
                     },
                     {
                         participantId: ObjectId("123456789012"),
-                        transactionId: ObjectId("123456789012")
+                        transactionId: ObjectId("123456789012"),
+                        items: []
                     }
                 ],
                 accounts: [
@@ -76,16 +140,16 @@ describe('Testing API Event (CRUD)', () => {
                         accountNumber: "0812039012"
                     },
                 ],
-                createdUserId: 1
+                createdUserId: ObjectId("123456789012")
             });
     
+
         const event = await Event.findOne({
-            createdUserId: 1
+            createdUserId: ObjectId("123456789012")
         });
     
         expect(response.status).toBe(201);
-        expect(response.body.message).toBe('Event has been added');
-    
+
         expect(event._id).toBeTruthy();
         expect(event.name).toBeTruthy();
         expect(event.createdUserId).toBeTruthy();
@@ -127,7 +191,7 @@ describe('Testing API Event (CRUD)', () => {
                         accountNumber: "0812039012"
                     },
                 ],
-                createdUserId: 1
+                createdUserId: ObjectId("123456789012")
             });
     
             expect(response.status).toBe(200);
@@ -152,7 +216,7 @@ describe('Testing OCR', () => {
 
         request.post('/events/ocr')
             .send({
-                photo: "www.poto.com"
+                photo: "gs://split-bill-bucket/1.jpg"
             })
             .expect(200)
             .end((err, response) => {
@@ -168,5 +232,6 @@ describe('Testing OCR', () => {
 
 afterAll(async () => {
     await Event.deleteMany();
+    await User.deleteMany();
     // await mongoose.connection.close();
 });
