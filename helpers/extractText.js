@@ -17,7 +17,10 @@ function isValidItem(item) {
         "jakarta", 
         "jl", "jl.",
         "guest", 
-        "no.", "tanggal", "meja"
+        "no.", "tanggal", "meja", "table",
+        "2017", "2020",
+        "pax: ",
+        "makanan untuk"
         // "jan", "feb", "mar", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "des"
     ];
     for (let i = 0; i < invalidItemCode.length; i++) {
@@ -78,6 +81,7 @@ async function getItems(imgUrl) {
     try {
         const [result] = await client.textDetection(imgUrl);
         let words = result.fullTextAnnotation && result.fullTextAnnotation.text.split("\n") || "";
+        console.log(words);
         if (words.length > 0) {            
             let items = [];
     
@@ -103,12 +107,10 @@ async function getItems(imgUrl) {
             return itemWithPrice;
             console.log({itemWithPrice});
         }else{
-            console.log('masuk kesini ' , result);
-            return;
+            return result;
         }
     } catch (error) {
-        console.log('Error nih' , error);
-        return
+        return error;
     }
 
 
@@ -127,11 +129,10 @@ const gokana        = 'https://funtachi.files.wordpress.com/2013/02/35.jpg';
 const upnormal      = 'https://media-cdn.tripadvisor.com/media/photo-s/0e/4a/dd/6a/struk.jpg';
 const aws           = 'https://jsprojectdev37.s3-ap-southeast-1.amazonaws.com/1584945069337-test.jpg';
 const dunkin        = 'https://2.bp.blogspot.com/-xc1miug9fA0/VscbBevwUjI/AAAAAAAAAFE/TQIKNxXlko8/s1600/WP_20160219_016%255B1%255D.jpg';
-const test          = 'https://jsprojectdev37.s3.ap-southeast-1.amazonaws.com/1584970320529-test.jpg';
+const test          = 'https://jsprojectdev37.s3.ap-southeast-1.amazonaws.com/1585080645169-test.jpg';
+const gcs           = 'gs://split-bill-bucket/coba-gcs.jpg';
 
-setTimeout(() => {
-    getItems(test)
-        .then(items => {
-            console.log({items});
-        });
-}, 1000);
+// getItems(gcs)
+//     .then(items => {
+//         console.log({items});
+//     });
