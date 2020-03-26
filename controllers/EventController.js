@@ -37,6 +37,7 @@ class EventController {
         let returnTransactions
         const { name, photo, accounts, createdUserId } = req.body;
         const event = new Event({ name, photo, status: false, participants: [], accounts, createdUserId });
+        
         event.save()
             .then((createdEvent) => {
                 newEvent = createdEvent
@@ -77,7 +78,6 @@ class EventController {
                 .populate('participants.participantId', 'name email username image_url')
             })
             .then(finalEventData => {
-                console.log(finalEventData)
                 res.status(201).json({
                     event: finalEventData,
                     transactions: returnTransactions
@@ -117,12 +117,7 @@ class EventController {
                     photo: req.body.photo
                 });
             })
-            .catch(err => {
-                res.status(400).json({
-                    message: 'Transaction not found',
-                    err
-                });
-            })
+            .catch(next)
     }
 }
 

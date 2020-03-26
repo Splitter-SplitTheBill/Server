@@ -1,7 +1,14 @@
 const app = require('../app')
 const request = require('supertest')
+const mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId
 const TransactionModel = require('../models/transaction')
-const ObjectId = require('mongoose').Types.ObjectId;
+
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+
 // let userMock = {
     // _id: ObjectId('5e77191f97ed86369f7d2bfa')
     // }

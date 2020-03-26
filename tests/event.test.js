@@ -24,7 +24,10 @@ let registerOne = {
     friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
     image_url: linkImage
 }
-
+let username
+let token
+let userId
+let accountId
 
 beforeAll(async () => {
     // Connect to a Mongo DB
@@ -89,7 +92,8 @@ describe('Register & Login', () => {
 
 describe('Testing API Event (CRUD)', () => {
     it('Should return all events from database', async done => {
-        const response = await request.get('/events');
+        const response = await request.get('/events')
+            .set('token', token)
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('events');
@@ -98,7 +102,7 @@ describe('Testing API Event (CRUD)', () => {
     });
     
     it('Should return an event from database', async done => {
-        const response = await request.get('/events/4edd40c86762e0fb12000003');
+        const response = await request.get('/events/4edd40c86762e0fb12000003')
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('event');
@@ -220,7 +224,7 @@ describe('Testing OCR', () => {
             })
             .expect(200)
             .end((err, response) => {
-                console.log(response.body);
+                // console.log(response.body);
                 expect(response.body).toHaveProperty('transactions');
                 expect(response.body).toHaveProperty('photo');
                 setTimeout(() => {                    

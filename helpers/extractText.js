@@ -46,7 +46,7 @@ function paringItemToPrice(items, words) {
         
     })
 
-    console.log({onlyItems});
+    // console.log({onlyItems});
 
     // process array item to their price
     onlyItems.map(item => {
@@ -81,7 +81,7 @@ async function getItems(imgUrl) {
     try {
         const [result] = await client.textDetection(imgUrl);
         let words = result.fullTextAnnotation && result.fullTextAnnotation.text.split("\n") || "";
-        console.log(words);
+        // console.log(words);
         if (words.length > 0) {            
             let items = [];
     
@@ -105,14 +105,13 @@ async function getItems(imgUrl) {
             let itemWithPrice = paringItemToPrice(items, words);
             // console.log(words);
             return itemWithPrice;
-            console.log({itemWithPrice});
+            // console.log({itemWithPrice});
         }else{
             return result;
         }
     } catch (error) {
         return error;
     }
-
 
 }
 
