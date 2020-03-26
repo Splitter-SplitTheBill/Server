@@ -1,48 +1,13 @@
-const request = require('supertest')
-const app = require('../app')
-const UserModel = require('../models/user')
-const EventModel = require('../models/event')
-const ObjectId = require('mongoose').Types.ObjectId;
+const mongoose  = require('mongoose');
+mongoose.set('bufferCommands', false);
 
-const linkImage = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+const ObjectId = mongoose.Types.ObjectId;
 
-let registerOne = {
-    name: 'One Direction',
-    email: 'one@mail.com',
-    username: 'one',
-    password: 'onedirection',
-    accounts: [{ name: 'BCA', instance: 'BCA', accountNumber: '111111' },
-                { name: 'OVO', instance: 'OVO', accountNumber: '222222' }],
-    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
-    image_url: linkImage
-}
-let registerTwo = {
-    name: 'Two Direction',
-    email: 'two@mail.com',
-    username: 'two',
-    password: 'twodirection',
-    accounts: [{ name: 'BRI', instance: 'BRI', accountNumber: '333333' },
-                { name: 'DANA', instance: 'DANA', accountNumber: '222222' }],
-    friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
-    image_url: linkImage
-}
-let userId_1
-let userId_2
-let token_1
+const app       = require('../app');
+const supertest = require('supertest');
+const request   = supertest(app);
 
-beforeAll((done) => {
-    request(app)
-    .post('/users/register')
-    .send(registerOne)
-    .end((err, res) => {
-        if(err) return done(err)
-        userId_1 = res.body._id
-        token_1 = res.body.token
-        setTimeout(() => {
-            done();
-        }, 1500);
-    })
-})
+const dbName    = 'splitter-test';
 
 const Event     = require('../models/event');
 const User      = require('../models/user');
@@ -59,7 +24,10 @@ let registerOne = {
     friendList: [{ userId: '5e7499e93c050e61249aeac7'}, { userId: '5e749f20ff201570c3629be0' }],
     image_url: linkImage
 }
-
+let username
+let token
+let userId
+let accountId
 
 beforeAll(async () => {
     // Connect to a Mongo DB
@@ -124,7 +92,8 @@ describe('Register & Login', () => {
 
 describe('Testing API Event (CRUD)', () => {
     it('Should return all events from database', async done => {
-        const response = await request.get('/events');
+        const response = await request.get('/events')
+            .set('token', token)
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('events');
@@ -133,7 +102,7 @@ describe('Testing API Event (CRUD)', () => {
     });
     
     it('Should return an event from database', async done => {
-        const response = await request.get('/events/4edd40c86762e0fb12000003');
+        const response = await request.get('/events/4edd40c86762e0fb12000003')
     
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('event');
@@ -245,8 +214,8 @@ describe('Testing API Event (CRUD)', () => {
     });
 });   
 
-describe('POST /events/ocr - success', () => {
-    it('should return status(200) and an array of object transactions and photo url', (done) => {
+describe('Testing OCR', () => {
+    it('should return array of object transactions and photo url', ( done ) => {
         jest.setTimeout(60000);
 
         request.post('/events/ocr')
@@ -255,7 +224,7 @@ describe('POST /events/ocr - success', () => {
             })
             .expect(200)
             .end((err, response) => {
-                console.log(response.body);
+                // console.log(response.body);
                 expect(response.body).toHaveProperty('transactions');
                 expect(response.body).toHaveProperty('photo');
                 setTimeout(() => {                    
@@ -269,4 +238,4 @@ afterAll(async () => {
     await Event.deleteMany();
     await User.deleteMany();
     // await mongoose.connection.close();
-})
+});

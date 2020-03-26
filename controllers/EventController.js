@@ -117,12 +117,7 @@ class EventController {
                     photo: req.body.photo
                 });
             })
-            .catch(err => {
-                res.status(400).json({
-                    message: 'Transaction not found',
-                    err
-                });
-            })
+            .catch(next)
     }
 }
 

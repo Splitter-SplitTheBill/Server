@@ -1,6 +1,12 @@
 const request = require('supertest')
 const app = require('../app')
+const mongoose = require('mongoose')
 const userModel = require('../models/user')
+
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 
 const linkImage = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
 
@@ -208,7 +214,7 @@ describe('GET /users:id - invalid access token', () => {
         .end((err, res) => {
             if(err) return done(err)
             expect(res.body).toHaveProperty('message')
-            expect(res.body.message).toContain('Please login first!')
+            expect(res.body.message).toContain('Invalid access')
             done()
         })
     })
